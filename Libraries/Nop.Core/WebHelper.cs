@@ -187,7 +187,7 @@ namespace Nop.Core
         public virtual string GetThisPageUrl(bool includeQueryString, bool useSsl)
         {
             string url = string.Empty;
-            if (!IsRequestAvailable(_httpContext))
+            if (_httpContext == null)
                 return url;
 
             if (includeQueryString)
@@ -199,10 +199,22 @@ namespace Nop.Core
             }
             else
             {
-                if (_httpContext.Request.Url != null)
+#if DEBUG
+                var uri = _httpContext.Request.Url;
+
+#else
+                //Since appharbor changes port number due to multiple servers, we need to ensure port = 80 as in AppHarborRequesWrapper.cs
+                var uri = new UriBuilder
                 {
-                    url = _httpContext.Request.Url.GetLeftPart(UriPartial.Path);
-                }
+                    Scheme = _httpContext.Request.Url.Scheme,
+                    Host = _httpContext.Request.Url.Host,
+                    Port = 80,
+                    Path = _httpContext.Request.Url.AbsolutePath,
+                    Fragment = _httpContext.Request.Url.Fragment,
+                    Query = _httpContext.Request.Url.Query.Replace("?", "")
+                }.Uri;
+#endif
+                url = uri.GetLeftPart(UriPartial.Path);
             }
             url = url.ToLowerInvariant();
             return url;

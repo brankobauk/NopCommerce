@@ -117,7 +117,7 @@ namespace Nop.Web
             if (!DataSettingsHelper.DatabaseIsInstalled())
             {
                 string installUrl = string.Format("{0}install", webHelper.GetStoreLocation());
-                if (!webHelper.GetThisPageUrl(false).StartsWith(installUrl, StringComparison.InvariantCultureIgnoreCase))
+                if (!webHelper.GetThisPageUrl(true).StartsWith(installUrl, StringComparison.InvariantCultureIgnoreCase))
                 {
                     this.Response.Redirect(installUrl);
                 }
